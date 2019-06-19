@@ -7,3 +7,4 @@ class MapModel(mongoengine.Document):
     x = mongoengine.IntField(default=0)
     y = mongoengine.IntField(default=0)
     z = mongoengine.IntField(default=0)
+    imageurl = mongoengine.StringField(max_length=200)

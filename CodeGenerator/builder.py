@@ -136,5 +136,5 @@ def SerializersCreate(tablename):
     fp.close()
 
 if __name__ == "__main__":
-    ModelCreate('base_role')
-    SerializersCreate('base_role')
+    ModelCreate('base_module')
+    SerializersCreate('base_module')

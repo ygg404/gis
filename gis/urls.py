@@ -17,7 +17,8 @@ from django.conf.urls import url,include
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^BaseUser/', include('apps.BaseManage.BaseUser.urls', namespace='BaseUser')),
-    url(r'^MapManage/', include('apps.MapManage.MapPlane.urls', namespace='MapPlane')),
+    url(r'^admin/$', admin.site.urls),
+    url(r'^BaseManage/BaseUser/$', include('apps.BaseManage.BaseUser.urls', namespace='BaseUser')),
+    url(r'^BaseManage/BaseRole/$', include('apps.BaseManage.BaseRole.urls', namespace='BaseRole')),
+    url(r'^MapManage/$', include('apps.MapManage.MapPlane.urls', namespace='MapPlane')),
 ]
