@@ -14,8 +14,7 @@ from UtilTool.Util.Config import Conf
 
 class Token(mongoengine.Document):
     userId = mongoengine.StringField(unique=True)   #用户ID
-    signToken = mongoengine.StringField(max_length= 40)  #用户名对应签名Token
-    secret = mongoengine.StringField(max_length= 50) #密钥
+    tokenSecret = mongoengine.StringField(max_length= 50) #密钥
     expireTime = mongoengine.DateTimeField(default=datetime.datetime.utcnow() + datetime.timedelta(hours = 6) ) #过期时间
     meta = {
            'indexes': [
@@ -32,18 +31,29 @@ class jwtHelper:
             'SignToken' : signToken
         }, Conf.getSysValue('jwtKey')).decode('utf-8').split('.')
         #保存token
-        Token(userId = userId,signToken = signToken, secret = jwtToken[2]).save()
+        Token(userId = userId,tokenSecret = jwtToken[2]).save()
         return  jwtToken[1]
 
     @staticmethod
     def _jwt_isValid(TokenStr):
+        payBase64 = TokenStr
         if(len(TokenStr)%3 == 1):
-            TokenStr += "=="
+            payBase64 = TokenStr + "=="
         elif(len(TokenStr)%3 == 2):
-            TokenStr += "="
-        base64.b64decode(TokenStr).decode('utf-8')
-        #解密Token
-        jwtToken = jwt.decode( Conf.getSysValue('jwtHeader') + TokenStr, Conf.getSysValue('jwtKey'))
+            payBase64 = TokenStr + "="
+        UserPayload = json.loads(base64.b64decode(payBase64).decode('utf-8'))
+        userId = UserPayload['userId']
+        signToken = UserPayload['SignToken']
+        #查找
+        TokenList = Token.objects( userId = userId)
+        if len( TokenList ) < 1:
+            raise Exception('令牌过期，重新登录！')
+        else:
+            tokenSecret = TokenList[0]['tokenSecret']
+            #解密Token
+            jwtToken = jwt.decode( Conf.getSysValue('jwtHeader') + '.' +  TokenStr + '.' + tokenSecret , Conf.getSysValue('jwtKey'))
+            if( signToken != jwtToken['SignToken']):
+                 raise Exception('令牌校验有误!')
 
 
 
@@ -53,25 +63,10 @@ class jwtHelper:
 
 if __name__ == '__main__':
     mongoengine.connect('gis')
-    jwtHelper._jwt_isValid('eyJ1c2VySWQiOiIxMTExMjEiLCJTaWduVG9rZW4iOiI5YzExN2ExZS05MzA3LTExZTktOGYwMC0wNGQ0YzQwNmIxYjMifQ')
-    token = jwtHelper._generate_jwt_token(userId = '111121')
 
-    token = Token(userId = '11211sssss2222',SignToken = str(uuid.uuid1()) ).save()
-    jwtTokenstr = token._generate_jwt_token().decode('utf-8')
-    print ( jwtTokenstr )
-
+    token = jwtHelper._generate_jwt_token(userId = '111psspddp121sss')
     try:
-        # raise Exception('test')
-        #解密Token
-        jwtToken = jwt.decode(jwtTokenstr,'secret_key_ygg')
-        #查找
-        TokenList = Token.objects( userId = jwtToken['userId'])
-        if len( TokenList ) < 1:
-            raise Exception('令牌过期，重新登录！')
-        else:
-            token = TokenList[0]
-            if( token.SignToken != jwtToken['SignToken'] or token.userId != jwtToken['userId']):
-                raise Exception('令牌有误!')
+        jwtHelper._jwt_isValid(token)
     except Exception as e:
         print(e)
 
