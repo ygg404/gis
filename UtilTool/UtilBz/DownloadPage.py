@@ -11,6 +11,10 @@ import requests
 from bs4 import BeautifulSoup #用于代替正则式 取源码中相应标签中的内容
 
 class DownloadPage:
+    def __init__(self,threadname = ''):
+        self.threadName = threadname
+        self.novelName = ''
+
     def get_content(self, url):
         ua = fake_useragent.UserAgent()
         headers = {
@@ -22,6 +26,7 @@ class DownloadPage:
     def get_page_chapter(self, url, dir_path):
         html = self.get_content(url)
         soup = BeautifulSoup( html ,'html.parser')
+        self.novelName =soup.find(attrs={'class':'titleInfo'}).h1.next
         # 小说图片
         sectionList = soup.find(attrs={'id':'play_0'}).ul.find_all('li')
         for section in sectionList:
@@ -47,13 +52,14 @@ class DownloadPage:
 
     def get_image(self, img_urls):
         #设置一个超时时间 取随机数 是为了防止网站被认定为爬虫
-        timeout = random.choice(range(80,180))
+        timeout = random.choice(range(50,130))
         while True:
             try:
                 req = requests.get(url=img_urls, timeout = timeout,)
                 break
             except Exception as e:
-                time.sleep(random.choice(range(8, 15)))
+                print(self.threadName + ':异常 睡眠---'  )
+                time.sleep(random.choice(range(2, 4)))
 
         if req.status_code == 200:
             return req.content
@@ -65,13 +71,13 @@ class DownloadPage:
         for url2 in self.base_64_decode(search_obj[0]):
             if isinstance(url2, str):
                 if url2:
-                    image_path = dir_path + '/' + chapter_name + '/P-%s.jpg' % count
-                    if not os.path.exists(dir_path + '/' + chapter_name):
-                        os.makedirs(dir_path + '/' + chapter_name)
+                    image_path = dir_path +  '/' + self.novelName + '/' + chapter_name + '/P-%s.jpg' % count
+                    if not os.path.exists(dir_path + '/' + self.novelName + '/' + chapter_name):
+                        os.makedirs(dir_path + '/' + self.novelName + '/' + chapter_name)
                     if not os.path.exists(image_path):
                         image = self.get_image("http://res.img.fffimage.com/" + url2)
                         if image:
                             with open(image_path, 'wb') as f:
                                 f.write(image)
-                                print( image_path )
+                                print( self.threadName + ":" + image_path )
                                 count += 1
