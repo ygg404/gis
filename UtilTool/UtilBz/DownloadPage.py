@@ -16,11 +16,17 @@ class DownloadPage:
         self.novelName = ''
 
     def get_content(self, url):
-        ua = fake_useragent.UserAgent()
-        headers = {
-            'User_Agent': ua.random}
-        response = requests.get(url, headers=headers)
-        a = response.content.decode('gb2312','ignore')
+        while True:
+            try:
+                ua = fake_useragent.UserAgent()
+                headers = {
+                    'User_Agent': ua.random}
+                response = requests.get(url, headers=headers)
+                a = response.content.decode('gb2312','ignore')
+                break
+            except Exception as e:
+                print(self.threadName + ':异常 睡眠---'  )
+                time.sleep(random.choice(range(2, 4)))
         return a
 
     def get_page_chapter(self, url, dir_path):
