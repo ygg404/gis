@@ -118,8 +118,8 @@ def SerializersCreate(tablename):
     #AppCreate(EntityName)
     fp = open(BASE_DIR + '\\apps\\' + EntityName + '\\serializers.py' , "w",encoding='utf8')
     fp.write("from rest_framework import serializers" +'\n')
-    modelName = EntityName + 'Model'
-    fp.write("import Models." + EntityName + ".models as " + modelName + '\n' + '\n')
+    modelName = EntityName + 'Entity'
+    fp.write("from apps." + EntityName + ".models import " + modelName + '\n' + '\n')
     fp.write('"""' + GetTableComment(tablename) + 'Serializer"""\n')
     for i in range(begin,end+1):
         if i-begin != 0 and (i-begin <= len(fieldDes)):
@@ -136,5 +136,5 @@ def SerializersCreate(tablename):
     fp.close()
 
 if __name__ == "__main__":
-    ModelCreate('base_module')
-    SerializersCreate('base_module')
+    ModelCreate('man_section')
+    SerializersCreate('man_section')

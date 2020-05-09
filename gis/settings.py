@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.BaseManage.BaseUser',
-    'apps.MapManage.MapPlane'
+    'apps.MapManage.MapPlane',
+    'apps.ManManage.ManImg'
 ]
 
 MIDDLEWARE = [

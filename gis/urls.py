@@ -19,6 +19,7 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/$', admin.site.urls),
     url(r'^BaseManage/BaseUser/$', include('apps.BaseManage.BaseUser.urls', namespace='BaseUser')),
-    url(r'^BaseManage/BaseRole/$', include('apps.BaseManage.BaseRole.urls', namespace='BaseRole')),
+    # url(r'^BaseManage/BaseRole/$', include('apps.BaseManage.BaseRole.urls', namespace='BaseRole')),
     url(r'^MapManage/$', include('apps.MapManage.MapPlane.urls', namespace='MapPlane')),
+    url(r'^ManManage/ManImg/', include('apps.ManManage.ManImg.urls', namespace='ManImg')),
 ]
